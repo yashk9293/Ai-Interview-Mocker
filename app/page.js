@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
+import Hero from "./_components/Hero"
+import { Header } from "./dashboard/_components/Header";
 
 export default function Home() {
   return (
   <div>
-    <h1>hello world</h1>
-    <Button>Hi</Button>
-
+    <Header/>
+    <Hero/>
   </div>
   );
 }
