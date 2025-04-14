@@ -8,16 +8,16 @@ export default[
                 value:'✔️ Create 10 Mock Interview'
             },
             {
-                vaule:'✔️ Unlimited Retake Interview'
+                value:'✔️ Unlimited Retake Interview'
             },
             {
-                vaule:'❌ Practice Question'
+                value:'✔️ Practice Question'
             },
             {
-                vaule:'❌ Live Doubt Access'
+                value:'❌ Live Doubt Access'
             },
             {
-                vaule:'❌ Chat Support'
+                value:'❌ Chat Support'
             },
         ]
     },
@@ -31,16 +31,16 @@ export default[
                 value:'✔️ Create 50 Mock Interview'
             },
             {
-                vaule:'✔️ Unlimited Retake Interview'
+                value:'✔️ Unlimited Retake Interview'
             },
             {
-                vaule:'✔️ Practice Question'
+                value:'✔️ Practice Question'
             },
             {
-                vaule:'✔️ Live Doubt Access'
+                value:'✔️ Live Doubt Access'
             },
             {
-                vaule:'✔️ Chat Support'
+                value:'✔️ Chat Support'
             },
         ]
     }
