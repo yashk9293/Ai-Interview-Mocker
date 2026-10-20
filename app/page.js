@@ -1,11 +1,6 @@
-import Hero from "./_components/Hero"
-import { Header } from "./dashboard/_components/Header";
+import HeroOne from "@/components/ui/hero-01";
 
+// The landing page is a single screen: header, hero and the roles strip.
 export default function Home() {
-  return (
-  <div>
-    <Header/>
-    <Hero/>
-  </div>
-  );
+  return <HeroOne />;
 }

@@ -1,53 +1,40 @@
 'use client'
 import React from 'react';
-import planData from '../../../utils/planData';
 import { useUser } from '@clerk/nextjs';
+import planData from '@/utils/planData';
+import PricingSection1 from '@/components/ui/pricing-section-1';
 
+const DESCRIPTIONS = {
+    Free: 'Everything you need to start practising out loud.',
+    Monthly: 'For a job hunt in full swing: more interviews, more help.',
+};
+
+// Plan. Checkout uses a Stripe test-mode payment link (no real charges).
 function Upgrade() {
     const { user } = useUser();
+    const email = user?.primaryEmailAddress?.emailAddress ?? '';
+
+    const tiers = planData.map((plan) => ({
+        id: String(plan.id),
+        name: plan.name,
+        description: DESCRIPTIONS[plan.name] ?? '',
+        price: `$${plan.cost === 0 ? '0' : plan.cost.toFixed(2)}`,
+        frequency: '/month',
+        features: plan.offering.map((o) => ({ text: o.value, included: o.included })),
+        popular: Boolean(plan.paymentLink),
+        cta: plan.paymentLink
+            ? { label: 'Upgrade', href: `${plan.paymentLink}?prefilled_email=${encodeURIComponent(email)}`, external: true }
+            : { label: 'Your current plan', disabled: true },
+    }));
 
     return (
-        <div className="p-10">
-            <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-center md:gap-8">
-                    {planData.map((item, index) => (
-                        <div key={index} className="rounded-2xl border border-gray-200 p-6 shadow-sm sm:px-8 lg:p-12">
-                            <div className="text-center">
-                                <h2 className="text-lg font-medium text-gray-900">
-                                    {item.name}
-                                    <span className="sr-only"> Plan</span>
-                                </h2>
-
-                                <p className="mt-2 sm:mt-4">
-                                    <strong className="text-3xl font-bold text-gray-900 sm:text-4xl">{item.cost}$</strong>
-                                    <span className="text-sm font-medium text-gray-700">/month</span>
-                                </p>
-                            </div>
-
-                            <ul className="mt-6 space-y-2">
-                                {item.offering.map((feature, i) => (
-                                    <li key={i} className="flex items-center gap-2">
-                                        <span className="text-m">{feature.value}</span>
-                                    </li>
-                                ))}
-                            </ul>
-
-                            {item.paymentLink ? (
-                                <a
-                                    href={`${item.paymentLink}?prefilled_email=${user?.primaryEmailAddress?.emailAddress}`}
-                                    target="_blank"
-                                    className="mt-8 block rounded-full border border-indigo-600 bg-white px-12 py-3 text-center text-sm font-medium text-indigo-600 hover:ring-1 hover:ring-indigo-600 focus:outline-none focus:ring active:text-indigo-500"
-                                >
-                                    Get Started
-                                </a>
-                            ) : (
-                                <p className="mt-8 text-center text-sm text-gray-500">You are on this plan</p>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
+        <PricingSection1
+            tiers={tiers}
+            eyebrow="Plan"
+            title="Pick the plan for your interview prep"
+            subtitle="You're on the Free plan. Checkout runs in Stripe test mode, so no real payment is taken."
+            headingLevel="h1"
+        />
     );
 }
 
