@@ -1,3 +1,5 @@
+import Image from "next/image";
+import Link from "next/link";
 import { SignUp } from "@clerk/nextjs";
 
 export default function Page() {
@@ -5,14 +7,17 @@ export default function Page() {
     <section className="bg-white">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
         <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
-          <img
+          <Image
             alt=""
-            src= "/signup.jpg"
-            className="absolute inset-0 h-full w-full object-cover opacity-80"
+            src="/signup.jpg"
+            fill
+            priority
+            sizes="(min-width: 1280px) 50vw, (min-width: 1024px) 42vw, 100vw"
+            className="object-cover opacity-80"
           />
 
           <div className="hidden lg:relative lg:block lg:p-12">
-            <a className="block text-white" href="#">
+            <Link className="block text-white" href="/">
               <span className="sr-only">Home</span>
               <svg
                 className="h-8 sm:h-10"
@@ -25,7 +30,7 @@ export default function Page() {
                   fill="currentColor"
                 />
               </svg>
-            </a>
+            </Link>
 
             <h2 className="mt-6 text-2xl font-bold text-white sm:text-3xl md:text-4xl">
               Welcome to AI Interview Mocker 🤖
@@ -40,9 +45,9 @@ export default function Page() {
         <main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
           <div className="max-w-xl lg:max-w-3xl">
             <div className="relative -mt-16 block lg:hidden">
-              <a
+              <Link
                 className="inline-flex size-16 items-center justify-center rounded-full bg-white text-blue-600 sm:size-20"
-                href="#"
+                href="/"
               >
                 <span className="sr-only">Home</span>
                 <svg
@@ -56,7 +61,7 @@ export default function Page() {
                     fill="currentColor"
                   />
                 </svg>
-              </a>
+              </Link>
 
               <h1 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
                 Welcome to AI Interview Mocker 🤖

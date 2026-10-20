@@ -1,8 +1,16 @@
+// drizzle-kit doesn't read .env on its own; Next.js does this for the app.
+try {
+  process.loadEnvFile();
+} catch {}
+
 /** @type { import("drizzle-kit").Config } */
-export default {
+const config = {
     schema: "./utils/schema.js",
+    out: "./drizzle",
     dialect: 'postgresql',
     dbCredentials: {
-      url: 'postgresql://neondb_owner:fI4sTyBzMLc7@ep-solitary-hill-a57dg5eu.us-east-2.aws.neon.tech/ai-mock-interview?sslmode=require',
+      url: process.env.DATABASE_URL,
     }
   };
+
+export default config;
