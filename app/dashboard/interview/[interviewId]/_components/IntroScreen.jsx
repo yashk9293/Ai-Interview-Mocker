@@ -1,6 +1,6 @@
-import { Check, Mic, Volume2 } from "lucide-react";
+import { Check, Mic, Radio, Volume2 } from "lucide-react";
 import { DIFFICULTIES, INTERVIEW_TYPES, averageRating } from "@/utils/interview";
-import { Panel, PanelHeader, PrimaryButton, Rating, TextAction, TitleRow } from "@/components/app/ui";
+import { Panel, PanelHeader, PrimaryButton, Rating, SecondaryButton, TextAction, TitleRow } from "@/components/app/ui";
 import WebcamPreview from "./WebcamPreview";
 
 // Interview intro. The question: "What will this interview cover, and am I
@@ -22,9 +22,15 @@ export default function IntroScreen({ interview, items }) {
         title={interview.jobPosition}
         line={`${INTERVIEW_TYPES[interview.interviewType]} · ${DIFFICULTIES[interview.difficulty]} · ${interview.jobExperience} years of experience · ${items.length} questions`}
         actions={
-          <PrimaryButton href={`/dashboard/interview/${interview.mockId}/start`}>
-            {started ? "Continue interview" : "Start interview"}
-          </PrimaryButton>
+          <>
+            {/* A spoken, two-way call; the main button is the question-by-question flow. */}
+            <SecondaryButton href={`/dashboard/interview/${interview.mockId}/live`}>
+              <Radio className="size-4" aria-hidden="true" /> Live interview
+            </SecondaryButton>
+            <PrimaryButton href={`/dashboard/interview/${interview.mockId}/start`}>
+              {started ? "Continue interview" : "Start interview"}
+            </PrimaryButton>
+          </>
         }
       />
 

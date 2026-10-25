@@ -36,6 +36,7 @@ const RecordAnswerSection = ({
   activeQuestionIndex,
   interviewData,
   onSaved,
+  onRecordingChange,
 }) => {
   const [loading, setLoading] = useState(false);
   const [webCamEnabled, setWebCamEnabled] = useState(false);
@@ -68,6 +69,10 @@ const RecordAnswerSection = ({
     lang,
     onEnd: (text, reason) => onRecordingEnd.current?.(text, reason),
   });
+
+  useEffect(() => {
+    onRecordingChange?.(isRecording);
+  }, [isRecording, onRecordingChange]);
 
   const transcript = results.map((result) => result.transcript.trim()).filter(Boolean).join(" ");
   const draft = drafts[activeQuestionIndex];

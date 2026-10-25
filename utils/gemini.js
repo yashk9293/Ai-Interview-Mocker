@@ -29,32 +29,76 @@ export class AIBusyError extends Error {}
 
 // Each call is a fresh, stateless request so prompts from different
 // interviews never share history. The schema forces valid JSON output.
-export async function generateJSON(prompt, schema, { systemInstruction } = {}) {
-  let response;
+// `prompt` is a string or a list of parts, e.g. text plus an inline PDF.
+// Network and overload errors are retried by the SDK; an empty or cut-off
+// JSON reply gets one fresh attempt here, since a second sample usually fits.
+export async function generateJSON(prompt, schema, { systemInstruction, temperature = 1 } = {}) {
+  for (let attempt = 1; ; attempt++) {
+    let response;
+    try {
+      response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          temperature,
+          maxOutputTokens: 8192,
+          responseMimeType: "application/json",
+          responseJsonSchema: schema,
+          safetySettings,
+          systemInstruction,
+        },
+      });
+    } catch (e) {
+      throw busyOrSelf(e);
+    }
+    try {
+      if (!response.text) throw new Error("Empty response from Gemini");
+      return JSON.parse(response.text);
+    } catch (e) {
+      if (attempt >= 2) throw e;
+      console.warn(`Gemini JSON unusable (${e.message}), retrying once`);
+    }
+  }
+}
+
+function busyOrSelf(e) {
+  if (e instanceof ApiError && (e.status === 429 || e.status >= 500)) {
+    return new AIBusyError(e.message);
+  }
+  if (e?.name === "AbortError" || e?.name === "TimeoutError") {
+    return new AIBusyError("Gemini request timed out");
+  }
+  return e;
+}
+
+const liveModel = process.env.GEMINI_LIVE_MODEL;
+
+// Ephemeral tokens exist only on v1alpha, so they get their own client.
+const tokens = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+  httpOptions: { apiVersion: "v1alpha", timeout: 10_000 },
+});
+
+// A short-lived token the browser uses to open one Live API session, with
+// the model and the whole session config locked in: the browser can't change
+// the instructions, tools or voice, or reuse the token for anything else.
+export async function createLiveToken(config) {
+  const now = Date.now();
+  let token;
   try {
-    response = await ai.models.generateContent({
-      model,
-      contents: prompt,
+    token = await tokens.authTokens.create({
       config: {
-        temperature: 1,
-        maxOutputTokens: 8192,
-        responseMimeType: "application/json",
-        responseJsonSchema: schema,
-        safetySettings,
-        systemInstruction,
+        uses: 1,
+        // The session must start within 2 minutes and ends after 30.
+        newSessionExpireTime: new Date(now + 2 * 60_000).toISOString(),
+        expireTime: new Date(now + 30 * 60_000).toISOString(),
+        liveConnectConstraints: { model: liveModel, config },
+        httpOptions: { apiVersion: "v1alpha" },
       },
     });
   } catch (e) {
-    if (e instanceof ApiError && (e.status === 429 || e.status >= 500)) {
-      throw new AIBusyError(e.message);
-    }
-    if (e?.name === "AbortError" || e?.name === "TimeoutError") {
-      throw new AIBusyError("Gemini request timed out");
-    }
-    throw e;
+    throw busyOrSelf(e);
   }
-  if (!response.text) {
-    throw new Error("Empty response from Gemini");
-  }
-  return JSON.parse(response.text);
+  if (!token?.name) throw new Error("No token from Gemini");
+  return { token: token.name, model: liveModel };
 }

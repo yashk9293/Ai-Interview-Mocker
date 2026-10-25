@@ -12,6 +12,10 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Interviews can be created with a resume PDF of up to 2 MB (MAX_RESUME_BYTES).
+  experimental: {
+    serverActions: { bodySizeLimit: "3mb" },
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
